@@ -6,6 +6,7 @@
 #include <list>
 #include <utility>
 #include <filesystem>
+#include <cstring>
 
 using namespace std;
  const string KEY_WORD_BACKUPS = "backups=",
@@ -20,12 +21,21 @@ void copyFromTo(const string& s, const string& d);
 
 int main(int argc, char* args[])
 {
-
+	bool init_mode = false;
+	int backups = 0;
 
     if(argc < 3 || argc > 4)
     {
         cout << "need exactly 2 args, path and profile name" << endl;
         return -1;
+    }
+    if(argc == 4 && strcmp(args[3], "init") == 0)
+    {
+     	cout << "initializing profile " << args[2] << endl;
+    	init_mode = true;
+    }
+    else{
+    	int backups = argc == 4 ? atoi(args[3]) : 0;
     }
 
     list<string*> copyTasks;
@@ -35,7 +45,7 @@ int main(int argc, char* args[])
     string cfgPath = args[1] + CFG_FILE_NAME;
     string dataLocation = args[1] + ROOT_DIR_NAME;
     string taskCfgPath = args[1] + TAKS_FILE_NAME;
-    int backups = argc == 4 ? atoi(args[3]) : 0;
+    
     if(backups > 4) backups = 4;
 
     string* currentProfile = getCurrentProfile(cfgPath);
@@ -83,8 +93,9 @@ int main(int argc, char* args[])
     
 
 	cout << endl << "start saving date" << endl << endl;
-    if(currentProfile->length() > 0)
+    if(currentProfile->length() > 0 && !init_mode)
     {
+    
         for(auto it = copyBackTasks.begin(); it != copyBackTasks.end(); ++it)
         {
         	string targetPath = dataLocation + *currentProfile + **it;
@@ -94,7 +105,7 @@ int main(int argc, char* args[])
         	}
         	if(backups > 0)
         		copyFromTo(targetPath, targetPath + ".back1");
-        		
+        	
             copyFromTo(**it, targetPath);
         }
     }
@@ -105,8 +116,12 @@ int main(int argc, char* args[])
     for(auto it = copyBackTasks.begin(); it != copyBackTasks.end(); ++it)
     {
         string sourcePath = dataLocation + targetProfile + **it;
-       copyFromTo(sourcePath, **it);
-       delete *it;
+        if(init_mode)
+       		copyFromTo(**it, sourcePath);
+       		else
+       		copyFromTo(sourcePath, **it);
+       		
+       	delete *it;
     }
     
     cout << endl << "start copy 2" << endl << endl;
@@ -114,7 +129,11 @@ int main(int argc, char* args[])
      for(auto it = copyTasks.begin(); it != copyTasks.end(); ++it)
     {
         string sourcePath = dataLocation + targetProfile + **it;
-        copyFromTo(sourcePath, **it);
+        if(init_mode)
+       		copyFromTo(**it, sourcePath);
+       		else
+       		copyFromTo(sourcePath, **it);
+        
         delete *it;
     }
 
