@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <cstring>
 
+namespace fs = std::filesystem;
 using namespace std;
  const string KEY_WORD_BACKUPS = "backups=",
         KEY_WORD_START_COPY_TASKS = "copy",
@@ -17,6 +18,7 @@ using namespace std;
         ROOT_DIR_NAME = "root/";
 
 string* getCurrentProfile(string& cfgPath);
+void CopySoft(const string& s, const string& d);
 void copyFromTo(const string& s, const string& d);
 
 int main(int argc, char* args[])
@@ -34,8 +36,8 @@ int main(int argc, char* args[])
      	cout << "initializing profile " << args[2] << endl;
     	init_mode = true;
     }
-    else{
-    	int backups = argc == 4 ? atoi(args[3]) : 0;
+    else if(argc == 4){
+    	backups = argc == 4 ? atoi(args[3]) : 0;
     }
 
     list<string*> copyTasks;
@@ -117,7 +119,7 @@ int main(int argc, char* args[])
     {
         string sourcePath = dataLocation + targetProfile + **it;
         if(init_mode)
-       		copyFromTo(**it, sourcePath);
+       		CopySoft(**it, sourcePath);
        		else
        		copyFromTo(sourcePath, **it);
        		
@@ -130,7 +132,7 @@ int main(int argc, char* args[])
     {
         string sourcePath = dataLocation + targetProfile + **it;
         if(init_mode)
-       		copyFromTo(**it, sourcePath);
+       		CopySoft(**it, sourcePath);
        		else
        		copyFromTo(sourcePath, **it);
         
@@ -147,11 +149,46 @@ int main(int argc, char* args[])
     return 0;
 }
 
+void createDir(const fs::path& dir)
+{
+	try {
+        fs::create_directories(dir);
+    }
+    catch (std::exception& e) { // Not using fs::filesystem_error since std::bad_alloc can throw too.
+        std::cout << e.what() << std::endl;
+    }
+}
+
+void CopySoft(const string& s, const string& d)
+{
+    fs::path folder(d);
+	folder.remove_filename();
+	createDir(folder);
+    try
+    {
+        fs::copy(s, d, fs::copy_options::skip_existing);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what();
+    }
+
+    cout << "copied soft from: " << s << " to " << d << endl;
+}
+
 void copyFromTo(const string& s, const string& d)
 {
-    std::ifstream  src(s, std::ios::binary);
-    std::ofstream  dst(d,   std::ios::binary);
-    dst << src.rdbuf();
+	fs::path folder(d);
+	folder.remove_filename();
+	createDir(folder);
+    try
+    {
+        fs::copy(s, d, fs::copy_options::overwrite_existing);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what();
+    }
 
     cout << "copied from: " << s << " to " << d << endl;
 }
