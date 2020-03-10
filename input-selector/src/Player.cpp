@@ -18,12 +18,14 @@ Player::Player(const Gamepad& pad,int id, const sf::Color& color) : id(id)
     shape = sf::CircleShape(rad);
     shape.setPosition(0.0f, 0.0f);
     shape.setOrigin(rad, rad);
-    speed = 5.0f/100.0f;
+    speed = 9.0f/60.0f;
 
     shape.setFillColor(sf::Color::Transparent);
     shape.setOutlineColor(color);
+    this->color = color;
     shape.setOutlineThickness(5.0f);
-    this->radius = rad + 8.0f;
+    this->radius = rad + 5.0f;
+    selected = nullptr;
 }
 
 Player::~Player()
@@ -58,12 +60,12 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
     float y = p_sprite->getPosition().y;
     if(x - radius < 0)
         x = radius;
-    if(x + radius > 1280)
-       x = 1280-radius;
+    if(x + radius > 1680)
+       x = 1680-radius;
     if(y - radius < 0)
         y = radius;
-    if(y + radius > 720)
-        y = 720-radius;
+    if(y + radius > 1050)
+        y = 1050-radius;
     p_sprite->setPosition(x, y);
 
     //player collision
@@ -71,6 +73,8 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if(*it != this)
         {
+            if((*it)->selected != nullptr)
+                continue;
             Player* p = *it;
 
             if(distance(p->p_sprite->getPosition(), p_sprite->getPosition()) <= radius*2)
@@ -97,11 +101,48 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
     }
  }
 
-void Player::handleInput(const std::list<Player*>& players)
+ bool inBounds(sf::Vector2f pos, Button b)
+ {
+    return b.shape.getGlobalBounds().contains(pos);
+ }
+
+void Player::handleInput(const std::list<Player*>& players, Button* buttons, int blength)
 {
-    if(sf::Joystick::isButtonPressed(id, 0)){
-        shape.setOutlineColor(sf::Color::White);
+    if(selected != nullptr)
+    {
+        if(sf::Joystick::isButtonPressed(id, 1))
+        {
+            selected->unSelect();
+            selected = nullptr;
+        }
+        else
+        {
+            return;
+        }
     }
+
+    if(sf::Joystick::isButtonPressed(id, 0)){
+
+    std::cout << "select: " << p_sprite->getPosition().x  << " - " <<p_sprite->getPosition().y<< std::endl;
+        for(int i = 0; i < blength; i++)
+        {
+
+         std::cout << "testing: " <<i  << buttons[i].owner << std::endl;
+            if(buttons[i].owner == nullptr && inBounds(p_sprite->getPosition(), buttons[i]))
+            {
+                 std::cout << "success: " <<i  << std::endl;
+                buttons[i].select(*this);
+                selected = &buttons[i];
+                setPosition(selected->shape.getPosition().x + selected->shape.getSize().x/2,
+                    selected->shape.getPosition().y + selected->shape.getSize().y/2,
+                    std::list<Player*>());
+
+
+                return;
+            }
+        }
+    }
+
 
     float x = sf::Joystick::getAxisPosition(id, sf::Joystick::X);
     float y = sf::Joystick::getAxisPosition(id, sf::Joystick::Y);

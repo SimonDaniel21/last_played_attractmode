@@ -1,10 +1,11 @@
 # depslib dependency file v1.0
-1583846173 source:/home/simon/Documents/input-selector/main.cpp
+1583865322 source:/home/simon/Documents/input-selector/main.cpp
 	<iostream>
 	<string>
 	<SFML/Graphics.hpp>
 	"Gamepad.h"
 	"Player.h"
+	"Button.h"
 	<list>
 
 1583805445 source:/home/simon/Documents/input-selector/src/Gamepad.cpp
@@ -20,19 +21,21 @@
 1583795992 /home/simon/Documents/input-selector/include/player.h
 	<SFML/Graphics.hpp>
 
-1583846197 source:/home/simon/Documents/input-selector/src/Player.cpp
+1583864868 source:/home/simon/Documents/input-selector/src/Player.cpp
 	"Player.h"
 	<math.h>
 	<iostream>
 
-1583843466 /home/simon/Documents/input-selector/include/Player.h
+1583865542 /home/simon/Documents/input-selector/include/Player.h
 	<SFML/Graphics.hpp>
 	"Gamepad.h"
 	<list>
-
-1583846924 source:/home/simon/Documents/input-selector/src/Button.cpp
 	"Button.h"
 
-1583846909 /home/simon/Documents/input-selector/include/Button.h
+1583864936 source:/home/simon/Documents/input-selector/src/Button.cpp
+	"Button.h"
+	"Player.h"
+
+1583862541 /home/simon/Documents/input-selector/include/Button.h
 	<SFML/Graphics.hpp>
 

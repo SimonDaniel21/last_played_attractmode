@@ -3,18 +3,25 @@
 #include <SFML/Graphics.hpp>
 #include "Gamepad.h"
 #include "Player.h"
+#include "Button.h"
 #include <list>
 
-int width = 1280, height = 720;
+int width = 1680, height = 1050;
 
 void updateControllers(std::list<Player*>& players, Gamepad* gamepads, int length);
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(1680, 1050), "SFML works!");
     window.setFramerateLimit(60);
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
+    sf::Texture reloadTex;
+    reloadTex.loadFromFile("assets/reload.png");
+    sf::Sprite reloadSprite(reloadTex);
+    reloadSprite.setOrigin(reloadTex.getSize().x/2.0f, reloadTex.getSize().y / 2.0f);
+    reloadSprite.setPosition(width /2, height / 4);
+    reloadSprite.setScale(100.0f/reloadTex.getSize().x, 100.0f/reloadTex.getSize().y);
 
 
 
@@ -32,11 +39,21 @@ int main()
     int length = 6;
 
     std::list<Player*> players;
+    int buttonsLength = 4;
+    float bw = width / 4.0f;
+    float bh = height/ 2.0f;
+    Button buttons[] =
+    {
+        Button(sf::Color::Red, sf::Rect<float>(0*bw, bh, bw, bh)),
+        Button(sf::Color::Blue, sf::Rect<float>(1*bw, bh, bw, bh)),
+        Button(sf::Color::Green, sf::Rect<float>(2*bw, bh, bw, bh)),
+        Button(sf::Color::Yellow, sf::Rect<float>(3*bw, bh,bw, bh))
+    };
    // Player p(gamepads[1],2, sf::Color::Blue);
    // players.push_back(p);
     updateControllers(players , gamepads, length);
 
-
+    sf::Color background(80,80,80);
     while (window.isOpen())
     {
         sf::Event event;
@@ -48,16 +65,23 @@ int main()
         }
 
          for(auto it = players.begin(); it != players.end(); it++)
-            {
-                (*it)->handleInput(players);
-            }
+        {
+            (*it)->handleInput(players, buttons, buttonsLength);
+        }
 
-        window.clear(sf::Color::Green);
+        window.clear(background);
+        for(int i = 0; i < buttonsLength; i++)
+        {
+            window.draw(buttons[i]);
+        }
+
+        window.draw(reloadSprite);
+
         for(auto it = players.begin(); it != players.end(); it++)
         {
             window.draw(**it);
         }
-        //window.draw(test);
+
         window.display();
     }
 

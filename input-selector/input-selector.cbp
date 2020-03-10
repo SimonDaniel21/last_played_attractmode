@@ -38,9 +38,11 @@
 			<Add library="sfml-window" />
 			<Add library="sfml-system" />
 		</Linker>
+		<Unit filename="include/Button.h" />
 		<Unit filename="include/Gamepad.h" />
 		<Unit filename="include/Player.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Button.cpp" />
 		<Unit filename="src/Gamepad.cpp" />
 		<Unit filename="src/Player.cpp" />
 		<Extensions>
