@@ -1,0 +1,22 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+#include <SFML/Graphics.hpp>
+#include "Gamepad.h"
+
+class Player : public sf::Drawable
+{
+    public:
+        Player(const Gamepad& pad);
+        virtual ~Player();
+        float sizeX = 100, sizeY = 100;
+        void handleInput(const sf::Event& event);
+
+    protected:
+
+    private:
+    sf::CircleShape shape(50.f);
+        sf::Sprite* p_sprite;
+        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+};
+
+#endif // PLAYER_H

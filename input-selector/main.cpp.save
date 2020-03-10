@@ -1,0 +1,86 @@
+#include <iostream>
+#include <string>
+#include <SFML/Graphics.hpp>
+#include "Gamepad.h"
+#include "Player.h"
+#include <list>
+
+int main()
+{
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
+
+    std::string id =  sf::Joystick::getIdentification(0).name;
+    std::cout << id << std::endl;
+
+    //sf::Sprite test(t_XBOX_WIRELESS);
+    //test.setPosition(100.0f, 100.0f);
+    //test.setScale(0.5f, 0.5f);
+    Gamepad gamepads[] ={
+        Gamepad("generic game pad", "assets/icon_generic.png"),
+        Gamepad("generic game pad", "assets/icon_arcade.png"),
+        Gamepad("Sony Playstation 3", "assets/icon_ps3.png"),
+        Gamepad("Sony Playstation 4", "assets/icon_ps4.png"),
+        Gamepad("wii remote", "assets/icon_wii_remote.png"),
+        Gamepad("Xbox Wireless Controller", "assets/icon_xbox_one_s.png")
+        };
+    int length = 6;
+
+    std::list<Player*> players;
+   // Player p(gamepads[1],2, sf::Color::Blue);
+   // players.push_back(p);
+
+    for(int i = 0; i < 6; i++)
+    {
+        if(!sf::Joystick::isConnected(i))
+        {
+            break;
+        }
+        Player* p_player;
+        bool found = false;
+        for(int j = 0; j < length; j++)
+        {
+            std::cout << "compare: " << sf::Joystick::getIdentification(i).name << ", with: " << gamepads[j].identifier_name;
+            if(gamepads[j].identifier_name.compare(sf::Joystick::getIdentification(i).name) == 0)
+            {
+                found = true;
+                p_player = new Player(gamepads[j], i,  sf::Color::Blue);
+                break;
+            }
+        }
+        if(!found)
+            p_player = new Player(gamepads[0], i,  sf::Color::Blue);
+
+         players.push_back(p_player);
+    }
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            for(auto it = players.begin(); it != players.end(); it++)
+            {
+                (*it)->handleInput(event);
+            }
+        }
+
+        window.clear(sf::Color::Green);
+        for(auto it = players.begin(); it != players.end(); it++)
+        {
+            window.draw(**it);
+        }
+        //window.draw(test);
+        window.display();
+    }
+
+    for(auto it = players.begin(); it != players.end(); it++)
+    {
+                delete *it;
+    }
+    return 0;
+}
+

@@ -1,0 +1,18 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+#include <SFML/Graphics.hpp>
+#include "Gamepad.h"
+
+class player
+{
+    public:
+        player();
+        virtual ~player();
+
+    protected:
+
+    private:
+        sf::Sprite sprite;
+};
+
+#endif // PLAYER_H

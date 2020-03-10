@@ -1,0 +1,72 @@
+#include "Player.h"
+#include <math.h>
+#include <iostream>
+
+Player::Player(const Gamepad& pad,int id, const sf::Color& color) : id(id)
+{
+    p_sprite = new sf::Sprite(pad.tex);
+    float xScale = size / p_sprite->getTexture()->getSize().x ;
+    float yScale = size /  p_sprite->getTexture()->getSize().y ;
+
+    float w = p_sprite->getTexture()->getSize().x;
+    float h = p_sprite->getTexture()->getSize().y;
+    float scale = w < h ? size /  h : size / w;
+    p_sprite->setScale(scale, scale);
+    p_sprite->setOrigin(w/2.0f, h/2.0f);
+
+    float rad = std::sqrt(std::pow(size/2.0f, 2)*2);
+    std::cout << rad << std::endl;
+    shape = sf::CircleShape(rad);
+    shape.setPosition(0.0f, 0.0f);
+    shape.setOrigin(rad, rad);
+    speed = 5.0f/100.0f;
+
+    shape.setFillColor(sf::Color::Transparent);
+    shape.setOutlineColor(color);
+    shape.setOutlineThickness(5.0f);
+    this->radius = rad + 5.0f;
+}
+
+Player::~Player()
+{
+    delete p_sprite;
+}
+
+void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+     target.draw(shape, states);
+    target.draw(*p_sprite, states);
+}
+
+ void Player::updatePosition()
+ {
+    shape.setPosition(p_sprite->getPosition());
+ }
+
+ void Player::collision()
+ {
+    float x = p_sprite->getPosition().x;
+    float y = p_sprite->getPosition().y;
+    if(x - radius < 0)
+        x = radius;
+    if(x + radius > 1280)
+       x = 1280-radius;
+    if(y - radius < 0)
+        y = radius;
+    if(y + radius > 720)
+        y = 720-radius;
+    p_sprite->setPosition(x, y);
+ }
+
+void Player::handleInput(const sf::Event& event)
+{
+    if(sf::Joystick::isButtonPressed())
+
+    float x = sf::Joystick::getAxisPosition(id, sf::Joystick::X);
+    float y = sf::Joystick::getAxisPosition(id, sf::Joystick::Y);
+    std::cout << x << std::endl;
+    p_sprite->move(x*speed, y*speed);
+    collision();
+    updatePosition();
+
+}
